@@ -2,14 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
-## [2.4.9.2]
+## [Unreleased]
 
 ### Added
 - Databases exported to Brightway now carry scenario metadata in
-  `bw2data.databases[name]`: `iam_model`, `pathway`, `year`,
-  `representative_time` (ISO 8601), `ecoinvent_version`, `system_model`,
-  `premise_version` and, if any, `external_scenarios`. Superstructure and
-  scenario-array databases list their scenarios under `scenarios`.
+  `bw2data.databases[name]`: `iam_model`, `pathway`, `representative_time`
+  (ISO 8601), `ecoinvent_version`, `system_model`, `premise_version` and,
+  if any, `external_scenarios`. Superstructure and scenario-array databases
+  list their scenarios under `scenarios`.
+
+## [2.4.9.2]
+
+### Added
 - Added `NewDatabase.write_scenario_array_db_to_brightway` for modern
   Brightway. It writes one union database and one compressed `bw_processing`
   ZIP containing synchronized technosphere and biosphere arrays, ordered as

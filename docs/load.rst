@@ -31,7 +31,8 @@ Scenario metadata
 *****************
 
 Every database written to brightway carries, in its brightway metadata, a description
-of the scenario and of the point in time it represents:
+of the scenario and of the point in time it represents. It sits next to the fields
+brightway maintains itself:
 
 .. code-block:: python
 
@@ -42,34 +43,35 @@ of the scenario and of the point in time it represents:
 .. code-block:: python
 
     {
-        ...,
+        # written by brightway
+        "format": "Ecoinvent XML",
+        "depends": ["ecoinvent-3.10.1-biosphere"],
+        "backend": "sqlite",
+        "number": 43648,
+        "modified": "2026-08-14T12:09:25.945746",
+        "processed": "2026-08-14T12:09:56.124243",
+        "geocollections": ["world"],
+        "searchable": True,
+        # written by premise
         "premise_version": "2.4.9.1",
         "iam_model": "remind",
         "pathway": "SSP2-PkBudg500",
-        "year": 2050,
         "representative_time": "2050-01-01T00:00:00",
         "ecoinvent_version": "3.10.1",
         "system_model": "cutoff",
     }
 
-``representative_time`` is an ISO 8601 timestamp, which makes it directly usable to
-build, for example, the ``database_dates`` mapping of bw_timex_:
+.. note::
 
-.. code-block:: python
+    ``bd.databases["db_name"]`` and ``bd.Database("db_name").metadata`` are the same
+    mapping, so the fields above can be read either way.
 
-    from datetime import datetime
-
-    database_dates = {
-        name: datetime.fromisoformat(meta["representative_time"])
-        for name, meta in bd.databases.items()
-        if "representative_time" in meta
-    }
-
-.. _bw_timex: https://github.com/brightway-lca/bw_timex
+``representative_time`` is the ISO 8601 point in time the database is representative of,
+and can be read back with ``datetime.fromisoformat()``.
 
 Databases holding several scenarios (superstructure and scenario-array databases)
-list them under a ``scenarios`` key instead, and only carry ``year`` and
-``representative_time`` at the top level if all their scenarios share the same year.
+list them under a ``scenarios`` key instead, and only carry ``representative_time``
+at the top level if all their scenarios share the same year.
 User (external) scenarios, if any, are listed under ``external_scenarios``.
 
 

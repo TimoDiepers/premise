@@ -187,7 +187,6 @@ def scenario_metadata(
         "premise_version": ".".join(str(item) for item in __version__),
         "iam_model": scenario["model"],
         "pathway": scenario["pathway"],
-        "year": year,
         # ISO 8601 point in time the database is representative of
         "representative_time": datetime(year, 1, 1).isoformat(),
     }
@@ -217,7 +216,7 @@ def database_metadata(
     Databases holding a single scenario get a flat description
     (see :func:`scenario_metadata`). Databases holding several scenarios
     (super-structure or scenario-array databases) get the list of scenarios
-    under `scenarios`, plus the year they all share, if any.
+    under `scenarios`, plus the point in time they all share, if any.
 
     :param scenarios: List of scenario dictionaries.
     :type scenarios: list
@@ -252,11 +251,9 @@ def database_metadata(
     if system_model is not None:
         metadata["system_model"] = system_model
 
-    years = {entry["year"] for entry in entries}
-    if len(years) == 1:
-        year = years.pop()
-        metadata["year"] = year
-        metadata["representative_time"] = datetime(year, 1, 1).isoformat()
+    times = {entry["representative_time"] for entry in entries}
+    if len(times) == 1:
+        metadata["representative_time"] = times.pop()
 
     return metadata
 

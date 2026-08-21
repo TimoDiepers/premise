@@ -459,9 +459,6 @@ def write_brightway_database(
 ) -> None:
     """
     Write a Brightway2 database from a Wurst database.
-
-    :param metadata: scenario metadata (IAM model, pathway, year, etc.)
-    to store alongside the database.
     """
     for act in data:
         act.setdefault("database", name)

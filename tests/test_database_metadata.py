@@ -19,8 +19,9 @@ def test_scenario_metadata_describes_scenario_and_time():
 
     assert metadata["iam_model"] == "remind"
     assert metadata["pathway"] == "SSP2-PkBudg500"
-    assert metadata["year"] == 2050
     assert metadata["representative_time"] == "2050-01-01T00:00:00"
+    # the year is already carried by the ISO timestamp
+    assert "year" not in metadata
     assert metadata["ecoinvent_version"] == "3.10.1"
     assert metadata["system_model"] == "cutoff"
     assert metadata["premise_version"] == ".".join(str(i) for i in __version__)
@@ -56,20 +57,21 @@ def test_database_metadata_for_several_scenarios_lists_them():
 
     metadata = database_metadata(scenarios, version="3.10.1", system_model="cutoff")
 
-    assert [s["year"] for s in metadata["scenarios"]] == [2050, 2030]
+    assert [s["representative_time"] for s in metadata["scenarios"]] == [
+        "2050-01-01T00:00:00",
+        "2030-01-01T00:00:00",
+    ]
     assert metadata["ecoinvent_version"] == "3.10.1"
     assert metadata["system_model"] == "cutoff"
     # years differ, so no single representative point in time
     assert "representative_time" not in metadata
-    assert "year" not in metadata
 
 
-def test_database_metadata_shares_year_when_scenarios_agree():
+def test_database_metadata_shares_time_when_scenarios_agree():
     scenarios = [SCENARIO, dict(SCENARIO, pathway="SSP2-NPi")]
 
     metadata = database_metadata(scenarios)
 
-    assert metadata["year"] == 2050
     assert metadata["representative_time"] == "2050-01-01T00:00:00"
     assert len(metadata["scenarios"]) == 2
 
@@ -106,10 +108,10 @@ def test_write_brightway2_database_stores_metadata(monkeypatch):
     brightway2_module.write_brightway_database(
         data=[{"code": "a", "location": "CH", "type": "process", "exchanges": []}],
         name="bw2-db",
-        metadata={"year": 2050, "representative_time": "2050-01-01T00:00:00"},
+        metadata={"iam_model": "remind", "representative_time": "2050-01-01T00:00:00"},
     )
 
-    assert databases["bw2-db"]["year"] == 2050
+    assert databases["bw2-db"]["iam_model"] == "remind"
     assert databases["bw2-db"]["representative_time"] == "2050-01-01T00:00:00"
 
 
@@ -130,11 +132,11 @@ def test_write_brightway25_database_stores_metadata_on_fast_path(monkeypatch):
         data=[{"code": "a", "exchanges": []}],
         name="fast-db",
         fast=True,
-        metadata={"iam_model": "image", "year": 2030},
+        metadata={"iam_model": "image", "representative_time": "2030-01-01T00:00:00"},
     )
 
     assert databases["fast-db"]["iam_model"] == "image"
-    assert databases["fast-db"]["year"] == 2030
+    assert databases["fast-db"]["representative_time"] == "2030-01-01T00:00:00"
     assert databases.modified == ["fast-db"]
 
 

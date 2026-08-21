@@ -323,7 +323,6 @@ def test_write_db_to_brightway_fast_path_runs_internal_check(monkeypatch):
     assert captured["written"]["check_internal"] is True
     assert captured["written"]["metadata"]["iam_model"] == "image"
     assert captured["written"]["metadata"]["pathway"] == "SSP2-Base"
-    assert captured["written"]["metadata"]["year"] == 2030
     assert (
         captured["written"]["metadata"]["representative_time"] == "2030-01-01T00:00:00"
     )
@@ -583,9 +582,9 @@ def test_write_superstructure_to_brightway_uses_fast_writer_after_full_preparati
     assert captured["written"]["name"] == "super-db"
     assert captured["written"]["fast"] is True
     assert captured["written"]["check_internal"] is False
-    assert [s["year"] for s in captured["written"]["metadata"]["scenarios"]] == [
-        scenario["year"] for scenario in obj.scenarios
-    ]
+    assert [
+        s["representative_time"] for s in captured["written"]["metadata"]["scenarios"]
+    ] == [f"{scenario['year']}-01-01T00:00:00" for scenario in obj.scenarios]
     assert captured["ended"] == obj.scenarios
     assert captured["pickles_deleted"] == 1
 
@@ -760,9 +759,9 @@ def test_write_scenario_array_writes_database_then_package_and_finalizes_once(
     assert database_call["name"] == "scenario-db"
     assert database_call["fast"] is True
     assert database_call["check_internal"] is False
-    assert [s["year"] for s in database_call["metadata"]["scenarios"]] == [
-        scenario["year"] for scenario in obj.scenarios
-    ]
+    assert [
+        s["representative_time"] for s in database_call["metadata"]["scenarios"]
+    ] == [f"{scenario['year']}-01-01T00:00:00" for scenario in obj.scenarios]
     package_call = events[2][1]
     assert package_call["dataframe"] is dataframe
     assert package_call["scenario_labels"] == [
