@@ -775,12 +775,26 @@ def _write_processed_database_fast(data: list, name: str) -> None:
     _write_search_index_fast(db.filename, data, name)
 
 
+def _store_database_metadata(name: str, metadata: dict = None) -> None:
+    """Attach scenario metadata to a registered Brightway database."""
+    if not metadata or name not in databases:
+        return
+    databases[name].update(metadata)
+    databases.set_modified(name)
+
+
 def write_brightway_database(
     data: list,
     name: str,
     fast: bool = False,
     check_internal: bool = True,
+    metadata: dict = None,
 ) -> None:
+    """Write a Brightway 2.5 database from a Wurst database.
+
+    :param metadata: scenario metadata (IAM model, pathway, year, etc.)
+    to store alongside the database.
+    """
     for act in data:
         act.setdefault("database", name)
 
@@ -802,6 +816,7 @@ def write_brightway_database(
             _print_database_overwrite(name)
         _compact_payload_for_fast_write(data, name)
         _write_processed_database_fast(data, name)
+        _store_database_metadata(name, metadata)
         _print_database_written(name)
         return
 
@@ -811,4 +826,5 @@ def write_brightway_database(
 
     with _fast_sqlite_writes(fast):
         BW25Importer(name, data).write_database()
+    _store_database_metadata(name, metadata)
     _print_database_written(name)

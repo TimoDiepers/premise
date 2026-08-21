@@ -442,14 +442,26 @@ def _compact_payload_for_fast_write(data: list) -> list:
     return data
 
 
+def _store_database_metadata(name: str, metadata: dict = None) -> None:
+    """Attach scenario metadata to a registered Brightway database."""
+    if not metadata or name not in databases:
+        return
+    databases[name].update(metadata)
+    databases.flush()
+
+
 def write_brightway_database(
     data: list,
     name: str,
     fast: bool = False,
     check_internal: bool = True,
+    metadata: dict = None,
 ) -> None:
     """
     Write a Brightway2 database from a Wurst database.
+
+    :param metadata: scenario metadata (IAM model, pathway, year, etc.)
+    to store alongside the database.
     """
     for act in data:
         act.setdefault("database", name)
@@ -481,4 +493,5 @@ def write_brightway_database(
         else:
             databases[name].pop("geocollections", None)
         databases.flush()
+    _store_database_metadata(name, metadata)
     _print_database_written(name)

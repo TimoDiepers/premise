@@ -27,6 +27,52 @@ If several databases have been built, the user can give them specific names, lik
     biosphere database already registered.
 
 
+Scenario metadata
+*****************
+
+Every database written to brightway carries, in its brightway metadata, a description
+of the scenario and of the point in time it represents:
+
+.. code-block:: python
+
+    import bw2data as bd
+
+    bd.databases["ei_cutoff_3.10.1_remind_SSP2-PkBudg500_2050"]
+
+.. code-block:: python
+
+    {
+        ...,
+        "premise_version": "2.4.9.1",
+        "iam_model": "remind",
+        "pathway": "SSP2-PkBudg500",
+        "year": 2050,
+        "representative_time": "2050-01-01T00:00:00",
+        "ecoinvent_version": "3.10.1",
+        "system_model": "cutoff",
+    }
+
+``representative_time`` is an ISO 8601 timestamp, which makes it directly usable to
+build, for example, the ``database_dates`` mapping of bw_timex_:
+
+.. code-block:: python
+
+    from datetime import datetime
+
+    database_dates = {
+        name: datetime.fromisoformat(meta["representative_time"])
+        for name, meta in bd.databases.items()
+        if "representative_time" in meta
+    }
+
+.. _bw_timex: https://github.com/brightway-lca/bw_timex
+
+Databases holding several scenarios (superstructure and scenario-array databases)
+list them under a ``scenarios`` key instead, and only carry ``year`` and
+``representative_time`` at the top level if all their scenarios share the same year.
+User (external) scenarios, if any, are listed under ``external_scenarios``.
+
+
 Superstructure database
 ***********************
 
